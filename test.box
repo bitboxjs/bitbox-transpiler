@@ -1,0 +1,12 @@
+import bitbox from 'bitbox'
+import {div,a} from 'bitbox/elements'
+
+const items = ['One', 'Two', 'Three']
+
+<component()>
+	<div items.map(item) bg="teal" padding=16>
+		<a color="white" margin=8>item</a>
+	</div>
+</component>
+
+bitbox.run(component, document.body)

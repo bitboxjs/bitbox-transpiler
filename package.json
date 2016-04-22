@@ -1,0 +1,67 @@
+{
+  "jspm": {
+    "name": "app",
+    "main": "main.js",
+    "directories": {
+      "lib": "src"
+    },
+    "dependencies": {
+      "js-beautify": "npm:js-beautify@^1.6.2"
+    },
+    "devDependencies": {
+      "bitbox": "npm:bitbox@^1.0.29",
+      "fs": "github:jspm/nodelibs-fs@^0.2.0-alpha",
+      "net": "github:jspm/nodelibs-net@^0.2.0-alpha",
+      "plugin-babel": "npm:systemjs-plugin-babel@^0.0.9",
+      "process": "github:jspm/nodelibs-process@^0.2.0-alpha",
+      "systemjs-hot-reloader": "github:capaj/systemjs-hot-reloader@^0.5.7",
+      "tty": "github:jspm/nodelibs-tty@^0.2.0-alpha",
+      "util": "github:jspm/nodelibs-util@^0.2.0-alpha"
+    },
+    "peerDependencies": {
+      "assert": "github:jspm/nodelibs-assert@^0.2.0-alpha",
+      "buffer": "github:jspm/nodelibs-buffer@^0.2.0-alpha",
+      "events": "github:jspm/nodelibs-events@^0.2.0-alpha",
+      "http": "github:jspm/nodelibs-http@^0.2.0-alpha",
+      "os": "github:jspm/nodelibs-os@^0.2.0-alpha",
+      "path": "github:jspm/nodelibs-path@^0.2.0-alpha",
+      "stream": "github:jspm/nodelibs-stream@^0.2.0-alpha",
+      "url": "github:jspm/nodelibs-url@^0.2.0-alpha",
+      "vm": "github:jspm/nodelibs-vm@^0.2.0-alpha"
+    },
+    "overrides": {
+      "npm:esprima@2.7.2": {
+        "jspmNodeConversion": false
+      },
+      "npm:inherits@2.0.1": {
+        "ignore": [
+          "test.js"
+        ]
+      },
+      "npm:readable-stream@1.0.34": {
+        "map": {
+          "stream": "stream-browserify/index"
+        },
+        "systemjs": {
+          "main": "readable.js"
+        },
+        "dependencies": {
+          "core-util-is": "~1.0.0",
+          "isarray": "0.0.1",
+          "string_decoder": "~0.10.0",
+          "inherits": "~2.0.1",
+          "stream-browserify": "~1.0.0"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "chokidar-socket-emitter": "^0.5.1",
+    "http-server": "^0.9.0",
+    "jspm": "^0.17.0-beta.13"
+  },
+  "scripts": {
+    "build": "jspm build app dist/transpiler.js --format umd --global-name bitbox_transpiler --minify --skip-source-maps",
+    "build:pub": "npm run build && npm publish ./dist"
+  }
+}

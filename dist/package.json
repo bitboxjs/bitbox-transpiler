@@ -1,0 +1,22 @@
+{
+  "name": "bitbox-transpiler",
+  "version": "1.0.2",
+  "description": "bitbox transpiler",
+  "keywords": [
+      "bitbox",
+      "bitbox transpiler",
+      "jsx",
+      "xjs"
+  ],
+  "main": "transpiler.js",
+  "registry": "npm",
+  "jspmPackage": true,
+  "format": "amd",
+  "author": "Sergiu Toderascu <sergiu.toderascu@gmail.com> (http://bitboxjs.com)",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitboxjs/bitbox-transpiler"
+  },
+  "homepage": "http://bitboxjs.com"
+}

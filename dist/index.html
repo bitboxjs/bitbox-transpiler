@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+	<head>
+		<title>bitbox-transpiler</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="theme-color" content="#000000">
+		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+		<style> body { background: #eee; margin: 0; padding: 24px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: Roboto; font-size: 14px; }</style>
+		<script src="transpiler.js"></script>
+	</head>
+	<body>
+
+		<script type="bitbox">
+
+			function fun(n) {
+				return n * 2
+			}
+
+			<app(props, body)>
+				return { props, body }
+			</app>
+
+			<foo()>
+				<app string="test" object={ foo: 1 } array=[1,2,3] fun(10)>
+					"Hello World!"
+				</app>
+			</foo>
+
+		</script>
+
+
+		<script>
+			window.unbox = bitbox_transpiler.default
+			var source = document.querySelector('script[type="bitbox"]').textContent;
+			var code = unbox(source)
+			var s = document.createElement('script')
+			var p = document.createElement('pre')
+			s.textContent = code
+			p.textContent = code
+			document.body.appendChild(s)
+			document.body.appendChild(p)
+		</script>
+	</body>
+
+</html>

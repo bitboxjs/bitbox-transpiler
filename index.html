@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<script src="jspm_packages/system.js"></script>
+<script src="jspm.browser.js"></script>
+<script src="jspm.config.js"></script>
+<body>
+	<script>
+	    var readyForMainLoad
+	    System.trace = true
+	    readyForMainLoad = System.import('systemjs-hot-reloader').then(function(HR){
+	    	hr = new HR.default()  // chokidar-socket-emitter port
+	    })
+	    Promise.resolve(readyForMainLoad).then(() => {
+	    	System.import('index.js').then(function (m) {
+	        	console.log('@ready', m);
+	    	})
+	    })
+	</script>
+</body>
