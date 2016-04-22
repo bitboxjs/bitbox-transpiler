@@ -8,30 +8,31 @@
 		<meta name="theme-color" content="#000000">
 		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
 		<style> body { background: #eee; margin: 0; padding: 24px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: Roboto; font-size: 14px; }</style>
+		<script src="//bitboxjs.com/bitbox.js"></script>
+		<script src="//bitboxjs.com/elements.js"></script>
 		<script src="transpiler.js"></script>
 	</head>
 	<body>
 
 		<script type="bitbox">
 
-			function fun(n) {
-				return n * 2
-			}
+			const items = ['One', 'Two', 'Three']
 
-			<app(props, body)>
-				return { props, body }
-			</app>
+			<component()>
+				<div items.map(item) bg="teal" padding=16>
+					<a color="white" margin=8>item</a>
+				</div>
+			</component>
 
-			<foo()>
-				<app string="test" object={ foo: 1 } array=[1,2,3] fun(10)>
-					"Hello World!"
-				</app>
-			</foo>
+			bitbox.run(component, document.body)
 
 		</script>
 
 
 		<script>
+			bitbox = bitbox.default
+			div = bitbox_elements.div
+			a = bitbox_elements.a
 			window.unbox = bitbox_transpiler.default
 			var source = document.querySelector('script[type="bitbox"]').textContent;
 			var code = unbox(source)

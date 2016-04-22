@@ -62,6 +62,7 @@
   },
   "scripts": {
     "build": "jspm build app dist/transpiler.js --format umd --global-name bitbox_transpiler --minify --skip-source-maps",
-    "build:pub": "npm run build && npm publish ./dist"
+    "deploy": "surge ./dist transpiler.bitboxjs.com",
+    "dist": "cp README.md ./dist && npm run build && npm run deploy && npm publish ./dist"
   }
 }
