@@ -380,7 +380,8 @@ export default class Parser {
 					node = { i, tag, name, key, attrs, props, parent, start: { pos, tok } }
                     node.type = b.selfClosing ? 'self-closing' : 'normal'
                     node.box  = b.box
-                    node.name = node.name ? node.name.match(/([a-z-0-9.]+)/)[1] : node.name
+                    const nmatch = node.name.match(/([a-z-0-9.]+)/) 
+                    node.name = node.name && nmatch ? nmatch[1] : node.name
                     node.camelName = this.toCamel(node.name)
                     node.comprop = b.comprop
                     node.dotprop = b.dotprop
