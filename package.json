@@ -9,7 +9,8 @@
       "js-beautify": "npm:js-beautify@^1.6.2"
     },
     "devDependencies": {
-      "bitbox": "npm:bitbox@^1.0.29",
+      "bitbox": "npm:bitbox@^1.0.30",
+      "bitbox-codemirror": "npm:bitbox-codemirror@^1.0.0",
       "fs": "github:jspm/nodelibs-fs@^0.2.0-alpha",
       "net": "github:jspm/nodelibs-net@^0.2.0-alpha",
       "plugin-babel": "npm:systemjs-plugin-babel@^0.0.9",
@@ -62,7 +63,8 @@
   },
   "scripts": {
     "build": "jspm build app dist/transpiler.js --format umd --global-name bitbox_transpiler --minify --skip-source-maps",
+    "build:demo": "jspm build demo.js - bitbox - bitbox/elements - bitbox-codemirror - bitbox-codemirror/view dist/demo.js --format umd --global-name demo --global-deps \"{'bitbox':'bitbox','bitbox/elements':'bitbox_elements','bitbox-codemirror':'bitboxCodemirror','bitbox-codemirror/view':'bitboxCodemirrorView'}\" --minify --skip-source-maps",
     "deploy": "surge ./dist transpiler.bitboxjs.com",
-    "dist": "cp README.md ./dist && npm run build && npm run deploy && npm publish ./dist"
+    "dist": "cp README.md ./dist && npm run build && npm run build:demo && npm run deploy && npm publish ./dist"
   }
 }

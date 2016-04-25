@@ -7,12 +7,24 @@
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="theme-color" content="#000000">
 		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
-		<style> body { background: #eee; margin: 0; padding: 24px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-family: Roboto; font-size: 14px; }</style>
+		<style> body { background: #eee; margin: 0; }</style>
 		<script src="//bitboxjs.com/bitbox.js"></script>
 		<script src="//bitboxjs.com/elements.js"></script>
+		<script src="//codemirror.bitboxjs.com/index.js"></script>
+		<script src="//codemirror.bitboxjs.com/view.js"></script>
 		<script src="transpiler.js"></script>
 	</head>
 	<body>
+		<script src="demo.js"></script>
+		<script>
+			demo.addServices({
+				transpile: bitbox_transpiler.default
+			})
+			demo.getSignals('transpile')({
+				path: ['output'],
+				value: demo.get('source').value
+			})
+		</script>
 
 		<script type="bitbox">
 
@@ -30,18 +42,18 @@
 
 
 		<script>
-			bitbox = bitbox.default
-			div = bitbox_elements.div
-			a = bitbox_elements.a
-			window.unbox = bitbox_transpiler.default
-			var source = document.querySelector('script[type="bitbox"]').textContent;
-			var code = unbox(source)
-			var s = document.createElement('script')
-			var p = document.createElement('pre')
-			s.textContent = code
-			p.textContent = code
-			document.body.appendChild(s)
-			document.body.appendChild(p)
+			// bitbox = bitbox.default
+			// div = bitbox_elements.div
+			// a = bitbox_elements.a
+			// window.unbox = bitbox_transpiler.default
+			// var source = document.querySelector('script[type="bitbox"]').textContent;
+			// var code = unbox(source)
+			// var s = document.createElement('script')
+			// var p = document.createElement('pre')
+			// s.textContent = code
+			// p.textContent = code
+			// document.body.appendChild(s)
+			// document.body.appendChild(p)
 		</script>
 	</body>
 

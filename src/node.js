@@ -57,9 +57,19 @@ let nodes = {
 
 	import: (node) => importNode(node, meta.import),
 	export: exportNode,
-	script: scriptNode,
+	//script: scriptNode,
 	//mod: modNode,
-	style: styleNode,
+
+	style(node) {
+		node.props.scope = `{ name: "${node.parent.name}", key: ${node.parent.props.key} }`
+		node.attrs.push({ key: 'text', type: 'keyed', value: 'text' })
+		return this.tag(node)
+	},
+
+	script(node) {
+		node.attrs.push({ key: 'text', type: 'keyed', value: 'text' })
+		return this.tag(node)
+	},
 
 	styles: [],
 	inits: [],
@@ -187,6 +197,7 @@ let nodes = {
 						case 'if':
 							outerexpr += `if ${ prop.value } {`
 							outerexprclose = `}`
+							node.parent._if = true
 							delete node.props.if
 						break;
 						case 'else':
@@ -204,6 +215,7 @@ let nodes = {
 						case 'switch':
 							innerexpr += `switch ${ prop.value } {`
 							innerexprclose = `}`
+							node._switch = true
 							delete node.props.switch
 						break;
 					}
@@ -354,7 +366,9 @@ let nodes = {
 						}
 
 
-						let treectx = node.parent.box || node.parent.parent === 'root' ? ['',''] : ['$tree.push(',');']
+						let treectx = (!node.parent.box && node.parent.parent !== 'root')
+							? ['$tree.push(',');']
+							: ['','']
 
 						let isnew = false
 						if (node.props.new) {
@@ -383,9 +397,10 @@ let nodes = {
 
 						const treeMatch = node.content.trim().match(re)
 
-						const treewrap = node.childrens > 1
+						const treewrap = node.childrens > 1 || node._if || node._switch
 							? [`($tree => {`,`return $tree })([])`]
 							: [``,``]
+
 						const a = `{ ${attrs} }${hasContent ? ',' : ''}`
 
 						node.parent.childrens = typeof node.parent.childrens !== 'undefined'
@@ -466,7 +481,7 @@ let nodes = {
 
 		let ret = `${ outerexpr }${ bodyornode }${ args }${ innerexpr }${ node.content }${ innerexprclose }${ bodyornodeend }${ outerexprclose }`
 
-		return ret.trim().replace(/\n\n/g, '\n')
+		return ret.trim(); //.replace(/\n\n/g, '\n')
 	},
 
 	isString(str) {

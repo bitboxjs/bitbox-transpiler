@@ -64,9 +64,9 @@ export default class Parser {
             else
                 node.component = node.parent.component
 
-            if (node.tag && node.tag.endsWith('=>')) {
-                node.return = true
-            }
+            // if (node.tag && node.tag.endsWith('=>')) {
+            //     node.return = true
+            // }
 
 			elements.unshift([ name, node.attrs ])
 			printer = new Printer(printer)
@@ -116,10 +116,17 @@ export default class Parser {
 		})
 
 		this.on('self-closing', (name, node) => {
+            //isnode = false
+            //var element = elements.shift()
+            //var content = printer.content
+            //printer = printer.parent
+            //node.content = content
+
 			if (typeof transform[name] === 'function')
 				printer.add(transform[name](node))
 			else
 				printer.add(transform.selfClosing(node))
+            //i--
 			//if (i === 0) this.emit('done')
 		})
 
@@ -380,7 +387,7 @@ export default class Parser {
 					node = { i, tag, name, key, attrs, props, parent, start: { pos, tok } }
                     node.type = b.selfClosing ? 'self-closing' : 'normal'
                     node.box  = b.box
-                    const nmatch = node.name.match(/([a-z-0-9.]+)/) 
+                    const nmatch = node.name.match(/([a-z-0-9.]+)/)
                     node.name = node.name && nmatch ? nmatch[1] : node.name
                     node.camelName = this.toCamel(node.name)
                     node.comprop = b.comprop
@@ -397,6 +404,7 @@ export default class Parser {
 
                     if (b.selfClosing) {
                         node.body = null
+                        this.text.push(pos + tag.length)
                         this.emit('self-closing', name, node)
                         this.emit('node', node)
                     } else {

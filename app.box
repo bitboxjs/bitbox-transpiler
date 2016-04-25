@@ -1,0 +1,21 @@
+import bitbox from 'bitbox'
+import editor from 'bitbox-codemirror/view'
+import {form,input,button,div} from 'bitbox/elements'
+
+function onChange(app) {
+	return ({ value }) => app.signals.transpile({
+		path: ['output'],
+		value
+	})
+}
+
+export default bitbox(app => {
+
+	const width = app.state.client.width / 2
+	const height = app.state.client.height
+
+	<div return>
+		<editor:source width height +auto-close-tags +auto-close-brackets +line-numbers on-change(app) />
+		<editor:output width height +auto-close-brackets +line-numbers />
+	</div>
+})

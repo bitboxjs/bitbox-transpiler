@@ -1,21 +1,20 @@
-import app from 'app'
-import demo from './test.box'
+import bitbox from 'bitbox'
+import transpile from 'app'
+import app from './app.js'
 
-console.log('demo', demo)
+app.addServices({
+	transpile
+})
 
-export const __reload = (m) => console.log('reload', m)
-export const __unload = () => console.clear()
+export const __unload = () => {
+	console.clear()
+}
 
-window.unbox = app
+export const __reload = () => {
+	app.getSignals('transpile')({
+		path: ['output'],
+		value: app.get('source').value
+	})
+}
 
-
-
-// var source = document.querySelector('script[type="bitbox"]').textContent;
-// var code = unbox(source)
-//
-// var s = document.createElement('script')
-// s.textContent = code
-//
-// document.body.appendChild(s)
-//
-// console.log(s)
+__reload()
