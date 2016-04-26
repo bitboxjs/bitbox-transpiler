@@ -6,6 +6,7 @@ import exportNode 	from './nodes/export'
 import scriptNode 	from './nodes/script'
 import styleNode 	from './nodes/style'
 import modNode 		from './nodes/mod'
+import { js_beautify as beautify } from 'js-beautify/js/lib/beautify'
 
 const config = {
 	h: 'bitbox.h',
@@ -192,7 +193,10 @@ let nodes = {
 							delete node.props.text
 						break;
 						case 'snippet':
-							node.props.snippet = `\`${node.body.replace(/\`/gm, '\\`')}\``
+							node.snippet = prop.value
+							if (node.snippet) {
+								node.props.snippet = node.body ? `\`${node.body.replace(/\`/gm, '\\`')}\`` : null
+							}
 						break;
 						case 'if':
 							outerexpr += `if ${ prop.value } {`
@@ -209,6 +213,7 @@ let nodes = {
 							if (prop.rel === 'invoke') {
 								innerexpr += `for ${ prop.value } {`
 								innerexprclose = `}`
+								node.__tree = true
 								delete node.props.for
 							}
 						break;
@@ -318,7 +323,9 @@ let nodes = {
 								this.bits.push([node.key, name])
 							}
 
-							let treectx = node.parent.parent === 'root' ? ['',''] : ['$tree.push(',');']
+							let treectx = (!node.parent.box && node.parent.parent !== 'root')
+								? ['$tree.push(',');']
+								: ['','']
 
 							let isnew = false
 							if (node.props.new) {
@@ -332,10 +339,6 @@ let nodes = {
 							}
 
 
-							let p = { ...node.props }
-							attrs = p ? `${ convertprops(p) }` : ``
-							const a = `{ ${ attrs } }`
-
 							node.object.key = key
 							node.object.props = `{${ attrs }}`
 
@@ -346,9 +349,20 @@ let nodes = {
 								? node.parent.childrens + 1
 								: 1
 
-							//isnative ||
+							// if (node.snippet == 2) {
+							// 	node.props.snippetJS = beautify(node.content, {
+							// 		indent_with_tabs: true,
+							// 		indent_size: 4
+							// 	})
+							// 	node.props.snippetJS = `\`${node.props.snippetJS.replace(/\`/gm, '\\`')}\``
+							// }
+
+							let p = { ...node.props }
+							attrs = p ? `${ convertprops(p) }` : ``
+							const a = attrs ? `{ ${ attrs } }` : ``
+
 							if (isnew)
-								bodyornode = `${treectx[0]}${config.h}('${bxname}', ${a})${treectx[1]}`
+								bodyornode = `${treectx[0]}${config.h}('${bxname}'${a?',':''}${a})${treectx[1]}`
 							else
 								bodyornode = `${treectx[0]}${bxname}(${a})${treectx[1]}`
 						}
@@ -375,47 +389,50 @@ let nodes = {
 							isnew = true
 							delete node.props.new
 						}
-
 						if (node.props.return || node.parent.box) {
 							treectx = [`return(`,`)`]
 							delete node.props.return
 						}
 
-
-						let p = { ...node.props }
-
-						attrs = p ? `${ convertprops(p) }` : ``
-
-
 						const nn = (node.comprop || node.dotprop || name)
 						const bxname = nn === 'element' ? `${config.element}` : nn
 
-						//const istree = node.content.trim().startsWith('$tree')
 						const hasContent = node.content.trim().length
+						const re = /^\$tree\.push\(([\s\S]*)\)\;$/g
+						//const treeMatch = node.content.trim().match(re)
 
-						const re = /^\$tree\.push\(([\s\S]*)\)\;$/gm
-
-						const treeMatch = node.content.trim().match(re)
-
-						const treewrap = node.childrens > 1 || node._if || node._switch
+						const treewrap = node.childrens > 1 || node._if || node._switch || node.__tree
 							? [`($tree => {`,`return $tree })([])`]
 							: [``,``]
-
-						const a = `{ ${attrs} }${hasContent ? ',' : ''}`
 
 						node.parent.childrens = typeof node.parent.childrens !== 'undefined'
 							? node.parent.childrens + 1
 							: 1
 
-						if (node.childrens === 1) {
+						if (node.childrens === 1 && !node.__tree) {
+							//console.log('childrens===1', node.name, node.content)
 							//node.content = node.content.trim().substr(11, node.content.length - 14)
 							node.content = node.content.trim().replace(re, "$1")
 						}
 
+						if (node.snippet == 2) {
+							let snippetJS = beautify(node.content, {
+								indent_with_tabs: true,
+								indent_size: 4
+							})
+							const snippet = node.props.snippet
+							snippetJS = `\`${snippetJS.replace(/\`/gm, '\\`')}\``
+							node.props.snippet = `{ in: ${snippet}, out: ${snippetJS} }`
+						}
+
+						let p = { ...node.props }
+						attrs = p ? `${ convertprops(p) }` : ``
+						const a = attrs ? `{ ${attrs} }` : ``
+
 						if (isnew)
-							bodyornode = `${treectx[0]}${config.h}('${bxname}', ${a}${treewrap[0]}`
+							bodyornode = `${treectx[0]}${config.h}('${bxname}'${a?',':''}${a}${hasContent?',':''}${treewrap[0]}`
 						else
-							bodyornode = `${treectx[0]}${bxname}(${a}${treewrap[0]}`
+							bodyornode = `${treectx[0]}${bxname}(${a}${a&&hasContent?',':''}${treewrap[0]}`
 
 						bodyornodeend = `${treewrap[1]})${treectx[1]}`
 						//console.log(node)
@@ -473,6 +490,7 @@ let nodes = {
 					})
 			}
 		}
+
 
 		index[node.i] = typeof index[node.i] !== 'undefined' ? index[node.i] + 1 : 1
 

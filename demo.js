@@ -1,7 +1,7 @@
 import bitbox from 'bitbox'
 import app from './app.js'
-import box from './app.box'
+import view from './app.box'
 
-app.run(box, document.body)
+app.render(view, document.body)
 
 export default app;

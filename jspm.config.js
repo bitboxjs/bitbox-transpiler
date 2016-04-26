@@ -25,7 +25,7 @@ SystemJS.config({
   ],
   map: {
     "assert": "github:jspm/nodelibs-assert@0.2.0-alpha",
-    "bitbox": "npm:bitbox@1.0.32",
+    "bitbox": "npm:bitbox@1.0.42",
     "bitbox-codemirror": "npm:bitbox-codemirror@1.0.1",
     "buffer": "github:jspm/nodelibs-buffer@0.2.0-alpha",
     "events": "github:jspm/nodelibs-events@0.2.0-alpha",
@@ -79,7 +79,7 @@ SystemJS.config({
     },
     "npm:bitbox-codemirror@1.0.1": {
       "map": {
-        "bitbox": "npm:bitbox@1.0.32"
+        "bitbox": "npm:bitbox@1.0.42"
       }
     },
     "npm:buffer@4.6.0": {
@@ -157,7 +157,7 @@ SystemJS.config({
         "ast-types": "npm:ast-types@0.8.16",
         "esprima": "npm:esprima@2.7.2",
         "private": "npm:private@0.1.6",
-        "source-map": "npm:source-map@0.5.4"
+        "source-map": "npm:source-map@0.5.5"
       }
     },
     "npm:stream-browserify@1.0.0": {
