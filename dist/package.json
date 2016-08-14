@@ -1,17 +1,15 @@
 {
   "name": "bitbox-transpiler",
-  "version": "1.0.6",
-  "description": "bitbox transpiler",
+  "version": "1.0.25",
+  "description": "Transform bitbox syntax to JavaScript",
   "keywords": [
       "bitbox",
       "bitbox transpiler",
-      "jsx",
-      "xjs"
+      "xjs",
+      "jsx"
   ],
-  "main": "transpiler.js",
-  "registry": "npm",
-  "jspmPackage": true,
-  "format": "amd",
+  "main": "bundle.umd.js",
+  "jsnext:main": "bundle.es.js",
   "author": "Sergiu Toderascu <sergiu.toderascu@gmail.com> (http://bitboxjs.com)",
   "license": "ISC",
   "repository": {

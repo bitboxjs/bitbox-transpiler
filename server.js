@@ -1,7 +1,7 @@
 'use strict'
 const httpServer = require('http-server')
 
-const port = 3001
+const port = 3011
 
 let cache = 3600
 if (process.env.NODE_ENV === 'production') {

@@ -1,6 +1,10 @@
 import observe      from './event'
 import transform    from './node'
-import { js_beautify as beautify } from 'js-beautify/js/lib/beautify'
+//import { js_beautify as beautify } from 'js-beautify/js/lib/beautify'
+
+function beautify(s) {
+    return s
+}
 
 function Printer(parent) {
     this.parent = parent;
@@ -108,9 +112,9 @@ export default class Parser {
 			node.content = content
 
 			if (typeof transform[name] === 'function')
-				printer.add(transform[name](node))
+				printer.add(transform[name](node, this.options))
 			else
-				printer.add(transform.tag(node))
+				printer.add(transform.tag(node, this.options))
 			i--
 			//if (i === 0) this.emit('done')
 		})
@@ -123,9 +127,9 @@ export default class Parser {
             //node.content = content
 
 			if (typeof transform[name] === 'function')
-				printer.add(transform[name](node))
+				printer.add(transform[name](node, this.options))
 			else
-				printer.add(transform.selfClosing(node))
+				printer.add(transform.selfClosing(node, this.options))
             //i--
 			//if (i === 0) this.emit('done')
 		})
@@ -333,10 +337,10 @@ export default class Parser {
 
                 b.out = b.out.replace(/([\w\-]+)\s?=?\s?['"`]([^'`"]+)["'`]/g, (match, key, value) => {
                     let type = 'static'
-                    if (key === 'class') {
-                        value = '{' + value.split(' ').map(c => `'${ c }': true`).join(', ') + '}'
-                        type = '{}'
-                    }
+                    // if (key === 'class') {
+                    //     value = '{' + value.split(' ').map(c => `'${ c }': true`).join(', ') + '}'
+                    //     type = '{}'
+                    // }
                     b.__i = b.props.push({ key, value, type, rel: 'assign' })
                     return b.__i
                 })
@@ -353,13 +357,25 @@ export default class Parser {
                         let reg = /[^A-Za-z0-9-]/
                         let v = i.split('=')
                         if (v.length === 2) {
-                            return { key: v[0], value: v[1], type: 'value' }
+                            return {
+                                key: v[0].startsWith('-') ? 'arg' + v[0] : v[0],
+                                value: v[1],
+                                type: 'value'
+                            }
                         }
                         if (i.indexOf('...') === 0)
                             return { key: i, type: 'spread' }
-                        if (i.startsWith('+') || i.startsWith('-'))
-                            return { key: i.substr(1), value: i[0] === '+' ? 1 : 0, type: '10' }
-                        return { key: i, value: i, type: 'keyed' }
+                        // if (i.startsWith('+') || i.startsWith('-'))
+                        //     return {
+                        //         key: i.substr(1),
+                        //         value: i[0] === '+' ? true : false,
+                        //         type: '10'
+                        //     }
+                        return {
+                            key: i.startsWith('-') ? 'arg' + i : i,
+                            value: i.startsWith('-') ? true : i,
+                            type: 'keyed'
+                        }
                     } else {
                         return null
                     }
@@ -559,10 +575,11 @@ export default class Parser {
 
 	}
 
-    parse(content, fn) {
+    parse(content, options, fn) {
         transform.clearMeta()
         transform.boxes = []
         this.fn = fn
+        this.options = options
         //let eqreg = /(\s+)?(\=)(\s+)?/g
         //content = content.replace(eqreg, '=')
         this.source = content
@@ -579,9 +596,9 @@ export default class Parser {
         //return this.compiled
     }
 
-    transform(code) {
+    transform(code, opts) {
         return {
-            code: this.parse('<mod>' + code + '</mod>'),
+            code: this.parse('<mod>' + code + '</mod>', opts),
             node: this.node
         }
     }

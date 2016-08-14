@@ -25,8 +25,8 @@ SystemJS.config({
   ],
   map: {
     "assert": "github:jspm/nodelibs-assert@0.2.0-alpha",
-    "bitbox": "npm:bitbox@1.0.42",
-    "bitbox-codemirror": "npm:bitbox-codemirror@1.0.1",
+    "bitbox": "npm:bitbox@1.0.49",
+    "bitbox-codemirror": "npm:bitbox-codemirror@1.0.2",
     "buffer": "github:jspm/nodelibs-buffer@0.2.0-alpha",
     "events": "github:jspm/nodelibs-events@0.2.0-alpha",
     "fs": "github:jspm/nodelibs-fs@0.2.0-alpha",
@@ -59,7 +59,7 @@ SystemJS.config({
     },
     "github:jspm/nodelibs-http@0.2.0-alpha": {
       "map": {
-        "http-browserify": "npm:stream-http@2.2.1"
+        "http-browserify": "npm:stream-http@2.3.0"
       }
     },
     "github:jspm/nodelibs-os@0.2.0-alpha": {
@@ -77,9 +77,9 @@ SystemJS.config({
         "url-browserify": "npm:url@0.11.0"
       }
     },
-    "npm:bitbox-codemirror@1.0.1": {
+    "npm:bitbox-codemirror@1.0.2": {
       "map": {
-        "bitbox": "npm:bitbox@1.0.42"
+        "bitbox": "npm:bitbox@1.0.49"
       }
     },
     "npm:buffer@4.6.0": {
@@ -100,20 +100,6 @@ SystemJS.config({
         "ms": "npm:ms@0.7.1"
       }
     },
-    "npm:falafel@1.2.0": {
-      "map": {
-        "acorn": "npm:acorn@1.2.2",
-        "foreach": "npm:foreach@2.0.5",
-        "isarray": "npm:isarray@0.0.1",
-        "object-keys": "npm:object-keys@1.0.9"
-      }
-    },
-    "npm:inline-process-browser@2.0.1": {
-      "map": {
-        "falafel": "npm:falafel@1.2.0",
-        "through2": "npm:through2@0.6.5"
-      }
-    },
     "npm:js-beautify@1.6.2": {
       "map": {
         "config-chain": "npm:config-chain@1.1.10",
@@ -131,65 +117,29 @@ SystemJS.config({
         "abbrev": "npm:abbrev@1.0.7"
       }
     },
-    "npm:readable-stream@1.0.34": {
+    "npm:readable-stream@2.1.2": {
       "map": {
         "core-util-is": "npm:core-util-is@1.0.2",
         "inherits": "npm:inherits@2.0.1",
-        "isarray": "npm:isarray@0.0.1",
-        "stream-browserify": "npm:stream-browserify@1.0.0",
-        "string_decoder": "npm:string_decoder@0.10.31"
-      }
-    },
-    "npm:readable-stream@2.1.0": {
-      "map": {
-        "core-util-is": "npm:core-util-is@1.0.2",
-        "inherits": "npm:inherits@2.0.1",
-        "inline-process-browser": "npm:inline-process-browser@2.0.1",
         "isarray": "npm:isarray@1.0.0",
         "process-nextick-args": "npm:process-nextick-args@1.0.6",
         "string_decoder": "npm:string_decoder@0.10.31",
-        "unreachable-branch-transform": "npm:unreachable-branch-transform@0.5.1",
         "util-deprecate": "npm:util-deprecate@1.0.2"
-      }
-    },
-    "npm:recast@0.11.5": {
-      "map": {
-        "ast-types": "npm:ast-types@0.8.16",
-        "esprima": "npm:esprima@2.7.2",
-        "private": "npm:private@0.1.6",
-        "source-map": "npm:source-map@0.5.5"
-      }
-    },
-    "npm:stream-browserify@1.0.0": {
-      "map": {
-        "inherits": "npm:inherits@2.0.1",
-        "readable-stream": "npm:readable-stream@1.0.34"
       }
     },
     "npm:stream-browserify@2.0.1": {
       "map": {
         "inherits": "npm:inherits@2.0.1",
-        "readable-stream": "npm:readable-stream@2.1.0"
+        "readable-stream": "npm:readable-stream@2.1.2"
       }
     },
-    "npm:stream-http@2.2.1": {
+    "npm:stream-http@2.3.0": {
       "map": {
         "builtin-status-codes": "npm:builtin-status-codes@2.0.0",
         "inherits": "npm:inherits@2.0.1",
+        "readable-stream": "npm:readable-stream@2.1.2",
         "to-arraybuffer": "npm:to-arraybuffer@1.0.1",
         "xtend": "npm:xtend@4.0.1"
-      }
-    },
-    "npm:through2@0.6.5": {
-      "map": {
-        "readable-stream": "npm:readable-stream@1.0.34",
-        "xtend": "npm:xtend@4.0.1"
-      }
-    },
-    "npm:unreachable-branch-transform@0.5.1": {
-      "map": {
-        "esmangle-evaluator": "npm:esmangle-evaluator@1.0.0",
-        "recast": "npm:recast@0.11.5"
       }
     },
     "npm:url@0.11.0": {

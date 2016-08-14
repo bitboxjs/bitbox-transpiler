@@ -1,20 +1,18 @@
-import bitbox from 'bitbox'
-import transpile from 'app'
-import app from './app.js'
+import translate from 'app'
 
-app.addServices({
-	transpile
-})
+window.translate = translate
 
-export const __unload = () => {
-	console.clear()
-}
 
-export const __reload = () => {
-	app.getSignals('transpile')({
-		path: ['output'],
-		value: app.get('source').value
-	})
-}
-
-__reload()
+// import './app.js'
+//
+// bitbox.services({
+// 	transpile: translate
+// })
+//
+// export const __reload = (m) => {
+// 	bitbox.services({ transpile: translate })
+// 	bitbox.signals('transpile', {
+// 		path: ['output'],
+// 		value: bitbox.get('source').value
+// 	})
+// }

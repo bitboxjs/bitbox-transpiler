@@ -6,24 +6,16 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="theme-color" content="#000000">
-		<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
-		<style> body { background: #eee; margin: 0; }</style>
-		<script src="//bitboxjs.com/bitbox.js"></script>
-		<script src="//bitboxjs.com/elements.js"></script>
-		<script src="//codemirror.bitboxjs.com/index.js"></script>
-		<script src="//codemirror.bitboxjs.com/view.js"></script>
-		<script src="transpiler.js"></script>
+		<style>
+			body { background: #222; margin: 0; }
+		</style>
+		<script src="//bitboxjs.com/global.js"></script>
+		<script src="bundle.global.js"></script>
 	</head>
 	<body>
-		<script src="demo.js"></script>
-		<script>
-			demo.addServices({
-				transpile: bitbox_transpiler.default
-			})
-			demo.getSignals('transpile')({
-				path: ['output'],
-				value: demo.get('source').value
-			})
+		<script type="bitbox">
+			<h1>Date()</h1>
 		</script>
+		<script src="script.js"></script>
 	</body>
 </html>

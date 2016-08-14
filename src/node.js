@@ -1,19 +1,23 @@
 import dom 			from './dom'
 import __source__ 	from './source'
 
-import importNode 	from './nodes/import'
-import exportNode 	from './nodes/export'
-import scriptNode 	from './nodes/script'
-import styleNode 	from './nodes/style'
-import modNode 		from './nodes/mod'
-import { js_beautify as beautify } from 'js-beautify/js/lib/beautify'
+//import importNode 	from './nodes/import'
+//import exportNode 	from './nodes/export'
+//import scriptNode 	from './nodes/script'
+//import styleNode 	from './nodes/style'
+//import modNode 		from './nodes/mod'
+//import { js_beautify as beautify } from 'js-beautify/js/lib/beautify'
 
-const config = {
-	h: 'bitbox.h',
+function beautify(s) {
+    return s
+}
+
+let config = {
+	h: 'box',
 	element: 'bitbox.element'
 }
 
-var entityMap = {
+let entityMap = {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -22,11 +26,11 @@ var entityMap = {
     "/": '&#x2F;'
   };
 
-  function escapeHtml(string) {
-    return String(string).replace(/[&<>"'\/]/g, function (s) {
-      return entityMap[s];
-    });
-  }
+function escapeHtml(string) {
+	return String(string).replace(/[&<>"'\/]/g, function (s) {
+	  return entityMap[s];
+	});
+}
 
 let scope = 'box'
 let index = []
@@ -56,20 +60,20 @@ let nodes = {
 	keys: {},
 	bits: [],
 
-	import: (node) => importNode(node, meta.import),
-	export: exportNode,
+	//import: (node) => importNode(node, meta.import),
+	//export: exportNode,
 	//script: scriptNode,
 	//mod: modNode,
 
-	style(node) {
+	_style(node, opts) {
 		node.props.scope = `{ name: "${node.parent.name}", key: ${node.parent.props.key} }`
 		node.attrs.push({ key: 'text', type: 'keyed', value: 'text' })
-		return this.tag(node)
+		return this.tag(node, opts)
 	},
 
-	script(node) {
+	_script(node, opts) {
 		node.attrs.push({ key: 'text', type: 'keyed', value: 'text' })
-		return this.tag(node)
+		return this.tag(node, opts)
 	},
 
 	styles: [],
@@ -82,9 +86,10 @@ let nodes = {
 	},
 
 
-	selfClosing(node) {
+	selfClosing(node, opts) {
 		node.content = -1
-		return this.tag(node)
+        node.selfClosing = true
+		return this.tag(node, opts)
 	},
 
 	// text: (text) => {
@@ -99,7 +104,9 @@ let nodes = {
 	// 		return "$tree.push(text(" + p + ", `" + (text.body.replace(/\`/g, '\`')) + "`));"
 	// },
 
-	tag(node) {
+	tag(node, opts) {
+
+        config = { ...config, ...opts }
 
 		//console.log('tag-node: ' + node.name, node.body)
 		this.lastNode = node
@@ -133,19 +140,13 @@ let nodes = {
 						if (node.parent === 'root' || node.parent.name === 'mod') {
 							//newbox = [`box.set(`, `)`]
 						} else {
-							newbox = [`${node.parent.name}.${ toCamel(node.name) } = `, ``]
+							//newbox = [`${node.parent.name}.${ toCamel(node.name) } = `, ``]
 							//newbox = [``, ``]
 						}
 
 						let _export = ``;
 						let _boxset = ``;
 						if (node.parent === 'root' || node.parent.name === 'mod') {
-							//__source__(node);
-							if (node.props.set || node.props.box) {
-								_boxset = `\nbox(${toCamel(node.name)});`
-								delete node.props.set
-								delete node.props.box
-							}
 							if (node.props.export) {
 								_export = `\nexport `
 								if (node.props.default)
@@ -161,13 +162,15 @@ let nodes = {
 						this.bits = []
 
 						// box(${ toCamel(node.name) }, { ${bits} });
-						outerexpr += `
-						${_export}${newbox[0]} function ${ toCamel(node.name) }${ args } {`
+						outerexpr += `${_export}${newbox[0]} function ${ toCamel(node.name) }${ args } {
+                            const ${config.h} = arguments[1];
+                            `
 
 							if (node.parent === 'root') {
 
 								const loads = Object.keys(meta.local).map(load => `new bitbox(${node.jsname}$box, ${load})`)
-								outerexpr += ``
+
+                                outerexpr += `const $box = arguments[1];\n`
 								outerexpr += `${ this.inits.join('\n')}\n`
 								outerexpr += `${ loads.join('\n')}\n`
 								this.keys = {}
@@ -176,7 +179,7 @@ let nodes = {
 								node.content = node.content.replace(/this\$box/g, `${node.jsname}$box`)
 							}
 
-						outerexprclose = outerexprclose + `}${newbox[1]}${_boxset}`
+						outerexprclose = outerexprclose + `\n}${newbox[1]}${_boxset}`
 						delete node.props[prop.key]
 					}
 
@@ -228,8 +231,20 @@ let nodes = {
 					if (prop.key.endsWith('.map')) {
 						if (node.childrens > 1)
 							throw(new Error(`Only one root element allowed for map, got ${node.childrens}\n${node.body}`))
-						innerexpr += `${ prop.key }(${ prop.value } => `
-						innerexprclose = `)`
+                        const hasContent = node.content === -1 || node.content.trim().length
+                        if (hasContent && !node.selfClosing) {
+                            innerexpr += `${ prop.key }(${ prop.value } => {`
+						    innerexprclose = `})`
+                        } else {
+                            node.content = `${ prop.key }${ prop.value }`
+                        }
+						delete node.props[prop.key]
+					}
+
+					if (prop.key.endsWith('.each')) {
+						innerexpr += `${ prop.key.replace('.each', '.forEach') }(${ prop.value } => {`
+						innerexprclose = `})`
+						node.__tree = true
 						delete node.props[prop.key]
 					}
 
@@ -237,14 +252,15 @@ let nodes = {
 
 						if (node.props[prop.key]) {
 
-							//console.log('-->', prop.key)
+							//console.log('-->', prop)
 
 							node.invoke = `${ node.name }.${ prop.key }${ prop.value }`
 							//console.log('node.invoke', node.props)
-							const imet = prop.key === 'color' || prop.key === 'style'
-								? `bitbox.${prop.key}`
-								: prop.key
-							node.props[prop.key] = `${toCamel(imet)}${ prop.value }`
+							// const imet = prop.key === 'color' || prop.key === 'style'
+							// 	? `bitbox.${prop.key}`
+							// 	: prop.key
+							const x = prop.key.startsWith('-') ? prop.key.substr(1) : prop.key
+							node.props[prop.key] = `${toCamel(x)}${ prop.value }`
 							//delete node.props[prop.key]
 						}
 					}
@@ -263,6 +279,15 @@ let nodes = {
 			// 	n = `${ node.content }`
 			node.content = `return (${node.content})`
 			//node.content = n.indexOf('$tree') === 0 ? n : `$tree.push(${ n });`
+		}
+
+		let _export = ``
+		if (node.props.export) {
+			_export = `\nexport `
+			if (node.props.default)
+				_export = `${_export}default `
+			delete node.props.export
+			delete node.props.default
 		}
 
 		if (node.props.case) {
@@ -318,10 +343,17 @@ let nodes = {
 							let key = name
 
 							if (node.key) {
-								node.props.module = `"${node.key}"`
-								__bind = `${node.key}`
-								this.bits.push([node.key, name])
+								//node.props.module = `"${node.key}"`
+								//__bind = `${node.key}`
+								//this.bits.push([node.key, name])
+								_export = `${_export}${node.key.indexOf('.') > -1 ? '' : 'const '}${toCamel(node.key)} = `
 							}
+
+                            const parentMap = Object.keys(node.parent.props).filter(k => k.endsWith('.map')).pop()
+                            if (parentMap) {
+                                node.props.return = true
+                                //delete node.parent.props[parentMap]
+                            }
 
 							let treectx = (!node.parent.box && node.parent.parent !== 'root')
 								? ['$tree.push(',');']
@@ -359,10 +391,16 @@ let nodes = {
 
 							let p = { ...node.props }
 							attrs = p ? `${ convertprops(p) }` : ``
-							const a = attrs ? `{ ${ attrs } }` : ``
-
-							if (isnew)
-								bodyornode = `${treectx[0]}${config.h}('${bxname}'${a?',':''}${a})${treectx[1]}`
+							const a = node.props.props || node.props['@']
+								? `${node.props.props || node.props['@'].substring(1)}`
+								: attrs ? `{ ${ attrs } }` : `` // `undefined`
+							const bt = (!node.name.startsWith(`bitbox`))
+							//node.parent.parent !== 'root'
+							//console.log('node',node)
+							if (isnew || isnative)
+								bodyornode = `${treectx[0]}${config.h}('${node.name}'${a?',':''}${a})${treectx[1]}`
+							else if (bt)
+								bodyornode = `${treectx[0]}${config.h}(${bxname}${a?',':''}${a})${treectx[1]}`
 							else
 								bodyornode = `${treectx[0]}${bxname}(${a})${treectx[1]}`
 						}
@@ -374,11 +412,17 @@ let nodes = {
 						let __bind = '{}' //node.props.bind || node.props.bit || 'this'
 						let key = name
 						if (node.key) {
-							node.props.module = `"${node.key}"`
-							__bind = `${node.key}`
-							this.bits.push([node.key, name])
+							// node.props.module = `"${node.key}"`
+							// __bind = `${node.key}`
+							// this.bits.push([node.key, name])
+							_export = `${_export}${node.key.indexOf('.') > -1 ? '' : 'const '}${toCamel(node.key)} = `
 						}
 
+                        const parentMap = Object.keys(node.parent.props).filter(k => k.endsWith('.map')).pop()
+                        if (parentMap) {
+                            node.props.return = true
+                            //delete node.parent.props[parentMap]
+                        }
 
 						let treectx = (!node.parent.box && node.parent.parent !== 'root')
 							? ['$tree.push(',');']
@@ -391,6 +435,7 @@ let nodes = {
 						}
 						if (node.props.return || node.parent.box) {
 							treectx = [`return(`,`)`]
+							//console.log('node box', node)
 							delete node.props.return
 						}
 
@@ -427,10 +472,16 @@ let nodes = {
 
 						let p = { ...node.props }
 						attrs = p ? `${ convertprops(p) }` : ``
-						const a = attrs ? `{ ${attrs} }` : ``
+						const a = node.props.props || node.props['@']
+							? `${node.props.props || node.props['@'].substring(1)}`
+							: attrs ? `{ ${attrs} }` : `` //`undefined`
 
-						if (isnew)
-							bodyornode = `${treectx[0]}${config.h}('${bxname}'${a?',':''}${a}${hasContent?',':''}${treewrap[0]}`
+						const bt = (!node.name.startsWith(`bitbox`)) // && node.parent.parent !== 'root'
+
+						if (isnew || isnative)
+							bodyornode = `${treectx[0]}${config.h}('${node.name}'${a?',':''}${a}${hasContent?',':''}${treewrap[0]}`
+						else if (bt)
+							bodyornode = `${treectx[0]}${config.h}(${bxname}${a?',':''}${a}${hasContent?',':''}${treewrap[0]}`
 						else
 							bodyornode = `${treectx[0]}${bxname}(${a}${a&&hasContent?',':''}${treewrap[0]}`
 
@@ -497,9 +548,9 @@ let nodes = {
 		let args = `` //keyvars.length ? `let { ${ keyvars.join(`, `) } } = props;` : ``
 		let isbody = false
 
-		let ret = `${ outerexpr }${ bodyornode }${ args }${ innerexpr }${ node.content }${ innerexprclose }${ bodyornodeend }${ outerexprclose }`
+		let ret = `${_export}${ outerexpr } ${ bodyornode }${ args }${ innerexpr }${ node.content }${ innerexprclose }${ bodyornodeend } ${ outerexprclose }`
 
-		return ret.trim(); //.replace(/\n\n/g, '\n')
+		return ret.replace(/\n\n/g, '\n')
 	},
 
 	isString(str) {
@@ -512,46 +563,6 @@ let nodes = {
 export default nodes;
 
 
-function normalizeStyle(subject) {
-
-	let pxkeys = ['width', 'height', 'left', 'top', 'right', 'bottom', 'padding-', 'margin-', 'font-size', 'border-radius']
-
-	let result = subject.replace(/(\w+[-]?\w+)\s?[:]\s?([^,\[\{\}]+)?(\[([^\]]+)\])?/g, (_, key, value="", __, pos="") => {
-
-		key = key.trim()
-		if (value)
-			value = value.trim()
-
-		let sub = key.split('-')[0] + '-';
-		let ispx = pxkeys.indexOf(sub)
-		if (ispx < 0) ispx = pxkeys.indexOf(key)
-
-		if (ispx > -1 && value[0] !== `"` && value[0] !== `'`)
-			if (!value.length && pos.length) {
-				value = pos.trim()
-				value = value.split(',')
-				value = value.map(x => {
-					x = x.trim()
-					if (x.endsWith('%'))
-						return `(${ x.substr(0, x.length-1) }) + "% "`
-					else
-						return parseInt(x) >= 0 ? `(${ x }) + "px "` : `${ x }`
-				}).join(' + ')
-			} else if (value.endsWith('%')) {
-				value = `(${ value.substr(0, value.length-1) }) + "%"`
-			} else {
-				value = parseInt(value) >= 0 ? `(${ value }) + "px"` : `${ value }`
-			}
-		else if (value.length && pos.length) value = value + __
-		key = toCamel(key)
-		if (parseInt(value) >= 0) value = `'${ value }'`
-		//console.log('res > ', { key, value }, parseInt(value))
-		return `${ key }: ${ value }`
-	})
-	//console.log('normalizeStyle >> result', result, '\n\n')
-	return result
-
-}
 function convertprops(p, a = ': ', b = ', ') {
 	let props = { ...p }
 	let keys = Object.keys(props)
@@ -564,25 +575,10 @@ function convertprops(p, a = ': ', b = ', ') {
 
 		let value = props[key]
 
-		if (key.indexOf('on-') === 0) {
-			events.push(`${ key.replace('on-', '') }${ a }${ value === key ? toCamel(value) : value }`)
-			delete props[key]
-		} else if (key === 'on') {
-			const v = value.substr(1, value.length - 2)
-			if (v) {
-				events.push(`${ v }`)
-				delete props[key]
-			} else {
-				result.push(`on`)
-			}
+		if (key === 'class') {
 
-		} else if (key === 'class') {
-			if (value.indexOf('[') === 0) {
-				const parts = value.substr(1, value.length - 2).split(',')
-				value = '{ ' + parts.map(p => p + ': true').join(', ') + ' }'
-			}
+			result.push(`className${ a }${ value }`)
 
-			result.push(`${ key }${ a }${ value }`)
 		} else if (key === 'style') {
 			result.push(`${ key }${ a }${ value }`)
 		} else if (key.indexOf('...') === 0) {
@@ -595,8 +591,8 @@ function convertprops(p, a = ': ', b = ', ') {
 		}
 	})
 
-	if (events.length)
-		result.push(`on${ a } { ${ events.join(b) } }`)
+	// if (events.length)
+	// 	result.push(`on${ a } { ${ events.join(b) } }`)
 
 	return result.join(b)
 

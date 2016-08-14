@@ -1,19 +1,21 @@
 import bitbox from 'bitbox'
 import editor from 'bitbox-codemirror'
-//import devtools from 'bitbox/devtools'
+import view from './index.box'
 
-const app = bitbox.app({
+export default bitbox.app({
 	client: {
 		width: window.innerWidth,
 		height: window.innerHeight
 	}
 })
 
-app.addServices({
-	transpile(v) { return v }
+bitbox.services({
+	transpile(v) {
+		return v
+	}
 })
 
-app.addSignals({
+bitbox.signals({
 	resized: [
 		function({ state }) {
 			state.set('client', {
@@ -40,7 +42,7 @@ app.addSignals({
 	]
 })
 
-app.addModules({
+bitbox.modules({
 	//devtools: devtools(),
 	source: editor({
 		value: localStorage.getItem('@source') || `const hi = (name) => <h1>name</h1>`
@@ -50,6 +52,7 @@ app.addModules({
 	})
 })
 
-window.onresize = () => app.getSignals('resized')()
+bitbox(view)
 
-export default app;
+window.onresize = () => bitbox.signals('resized')()
+/** */

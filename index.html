@@ -5,9 +5,24 @@
 <script src="jspm_packages/system.js"></script>
 <script src="jspm.browser.js"></script>
 <script src="jspm.config.js"></script>
+<script src="http://bitboxjs.com/box.min.js"></script>
+<style>
+	.CodeMirror.cm-s-material {
+	    font-family: Menlo,monospace!important;
+	    font-size: 13px!important;
+	    height: 100%!important;
+		line-height: 1.3;
+		background: rgba(40,44,52,1);
+	}
+	.CodeMirror.cm-s-material .CodeMirror-gutters {
+		background: rgba(40,44,52,1);
+	}
+</style>
 <body>
+	<div id="preview" style="position: absolute; top: 0; left: 50%; bottom: 0; right: 0; overflow: auto;">
+	</div>
 	<script>
-		System.import('demo.js')
+		//System.import('demo.js')
 	    var readyForMainLoad
 	    System.trace = true
 	    readyForMainLoad = System.import('systemjs-hot-reloader').then(function(HR){
